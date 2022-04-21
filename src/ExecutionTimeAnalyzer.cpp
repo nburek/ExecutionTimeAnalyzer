@@ -76,7 +76,7 @@ void ExecutionTimeAnalyzer::WorkerThread()
                     mSubTimer->AdvanceToAbsPosition(ending_sample);
                 }
                 U64 sub_end_sample = mSubTimer->GetSampleNumber();
-                U64 sub_time = (sub_end_sample - sub_start_sample) / (mSampleRateHz / 1000);
+                U64 sub_time = (sub_end_sample - sub_start_sample) * 1000000000 / ((U64)mSampleRateHz) ;
 
                 //Create a sub-timer frame 
                 Frame sub_frame;
@@ -89,13 +89,13 @@ void ExecutionTimeAnalyzer::WorkerThread()
                 mResults->AddFrame(sub_frame);
 
                 std::stringstream ss;
-                ss << "sub_time_" << (sub_frame_counter++);
+                ss << "sub_time_" << (sub_frame_counter++) << "_ns";
                 frame_v2.AddInteger(ss.str().c_str(), sub_time);
             }
         }
 
-        U64 total_time = (ending_sample - starting_sample) / (mSampleRateHz / 1000);
-        frame_v2.AddInteger("total", total_time);
+        U64 total_time = (ending_sample - starting_sample) * 1000000000 / ((U64)mSampleRateHz);
+        frame_v2.AddInteger("total_ns", total_time);
         mResults->AddFrameV2(frame_v2, "timer", starting_sample, ending_sample);
 
         // BUG: You must add this after the sub_frame or it causes display issues
